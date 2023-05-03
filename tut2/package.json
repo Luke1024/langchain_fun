@@ -1,0 +1,11 @@
+{
+  "name": "your-project",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "hnswlib-node": "^1.4.2",
+    "langchain": "^0.0.67",
+    "typescript": "^5.0.4"
+  }
+}
