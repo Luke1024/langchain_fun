@@ -3,3 +3,6 @@ tut2/node_modules
 
 tut1/.env
 tut2/.env
+
+experiment1/node_modules
+experiment1/build
