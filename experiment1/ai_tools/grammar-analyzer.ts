@@ -3,21 +3,41 @@ import 'dotenv/config'
 import { ChatPromptTemplate, HumanMessagePromptTemplate } from "langchain/prompts";
 import { LLMChain } from "langchain";
 
-export class GrammarDetector {
+export class GrammarAnalyzer {
 
-    chat:ChatOpenAI;
+    private chatDetector:ChatOpenAI;
+    private chatExplainer:ChatOpenAI;
 
     constructor() {
-        this.chat = new ChatOpenAI({
+        this.chatDetector = new ChatOpenAI({
             openAIApiKey: process.env.API_KEY,
             temperature: 0.0,
             modelName: process.env.LLM_MODEL,
             maxTokens:1
         });
+        this.chatExplainer = new ChatOpenAI({
+          openAIApiKey: process.env.API_KEY,
+          temperature: 0.5,
+          modelName: process.env.LLM_MODEL,
+        }) 
     }
 
     async isGrammarOk(text: string):Promise<boolean> {
         return this.analyzeModelResponse(this.getModelResponse(text))
+    }
+
+    async explainGrammar(text: string):Promise<string> {
+        const prompt = ChatPromptTemplate.fromPromptMessages([
+            HumanMessagePromptTemplate.fromTemplate("As an English language expert, please help me improve the following text by correcting grammar mistakes" +
+            "and explaining your changes: \"{text}\"")]);
+          const chain = new LLMChain({
+            prompt: prompt,
+            llm: this.chatExplainer,
+          });
+          const response = await chain.call({
+            text: text,
+          });
+        return response.text;
     }
 
     private async getModelResponse(text: string):Promise<string> {
@@ -26,7 +46,7 @@ export class GrammarDetector {
           ]);
           const chain = new LLMChain({
             prompt: prompt,
-            llm: this.chat,
+            llm: this.chatDetector,
           });
           const response = await chain.call({
             text: text,

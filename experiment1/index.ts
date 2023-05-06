@@ -1,4 +1,4 @@
-import { GrammarDetector } from "./ai_tools/grammar-detector";
+import { GrammarAnalyzer } from "./ai_tools/grammar-analyzer";
 
 export class Main {
 
@@ -12,7 +12,7 @@ export class Main {
       input: process.stdin,
       output: process.stdout,
     });
-    this.detector = new GrammarDetector();
+    this.detector = new GrammarAnalyzer();
   }
 
   run() {
@@ -24,7 +24,7 @@ export class Main {
         if(await this.detector.isGrammarOk(userInput)){
           console.log("It's ok.");
         } else {
-          console.log("No, I will explain:");
+          console.log(await this.detector.explainGrammar(userInput));
         }
         this.run();
       }
