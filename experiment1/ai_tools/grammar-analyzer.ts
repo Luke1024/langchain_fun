@@ -1,12 +1,16 @@
 import { ChatOpenAI } from "langchain/chat_models/openai";
 import 'dotenv/config'
-import { ChatPromptTemplate, HumanMessagePromptTemplate } from "langchain/prompts";
+import { ChatPromptTemplate, HumanMessagePromptTemplate, PromptTemplate } from "langchain/prompts";
 import { LLMChain } from "langchain";
 
 export class GrammarAnalyzer {
 
     private chatDetector:ChatOpenAI;
     private chatExplainer:ChatOpenAI;
+
+    private explainPrompt:string = "As an English language expert, please help me improve the following text by correcting grammar mistakes" +
+    "and explaining your changes: \"{text}\"";
+    private detectGrammarPrompt:string = "Is there a grammar error in the following text: \"{text}\"? Please respond with 'y' for yes or 'n' for no."
 
     constructor() {
         this.chatDetector = new ChatOpenAI({
@@ -28,8 +32,7 @@ export class GrammarAnalyzer {
 
     async explainGrammar(text: string):Promise<string> {
         const prompt = ChatPromptTemplate.fromPromptMessages([
-            HumanMessagePromptTemplate.fromTemplate("As an English language expert, please help me improve the following text by correcting grammar mistakes" +
-            "and explaining your changes: \"{text}\"")]);
+            HumanMessagePromptTemplate.fromTemplate(this.explainPrompt)]);
           const chain = new LLMChain({
             prompt: prompt,
             llm: this.chatExplainer,
@@ -42,7 +45,7 @@ export class GrammarAnalyzer {
 
     private async getModelResponse(text: string):Promise<string> {
         const prompt = ChatPromptTemplate.fromPromptMessages([
-            HumanMessagePromptTemplate.fromTemplate("Is there a grammar error in the following text: \"{text}\"? Please respond with 'y' for yes or 'n' for no."),
+            HumanMessagePromptTemplate.fromTemplate(this.detectGrammarPrompt),
           ]);
           const chain = new LLMChain({
             prompt: prompt,
